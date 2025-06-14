@@ -13,7 +13,8 @@ const store = createStore(allReducers);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    {/* <BrowserRouter> */}
+    <BrowserRouter basename="/Thang6.FE">
       <App />
     </BrowserRouter>
   </Provider>
