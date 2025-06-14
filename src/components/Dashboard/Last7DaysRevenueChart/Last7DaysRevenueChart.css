@@ -1,0 +1,22 @@
+.chart-container {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin: 4px 0 20px;
+}

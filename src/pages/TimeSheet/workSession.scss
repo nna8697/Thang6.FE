@@ -1,0 +1,274 @@
+/* Main container */
+.time-sheet-container {
+    padding: 1rem;
+    width: 95vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    @media (min-width: 1600px) {
+        width: 85vw;
+    }
+
+    @media (max-width: 768px) {
+        width: 100vw;
+        padding: 0.5rem;
+    }
+}
+
+/* Today's attendance card */
+.today-attendance-card {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .ant-card-head {
+        background-color: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .ant-card-body {
+        padding: 1rem;
+    }
+}
+
+/* Work sessions list */
+.work-sessions {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-top: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #1890ff #f0f2f5;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f0f2f5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #1890ff;
+        border-radius: 3px;
+    }
+
+    @media (max-height: 600px) {
+        max-height: 40vh;
+    }
+
+    .session-card {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background-color: white;
+        border-radius: 6px;
+        border-left: 4px solid #1890ff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .session-title {
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+
+            .session-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 1.5rem;
+                height: 1.5rem;
+                background-color: #1890ff;
+                color: white;
+                border-radius: 50%;
+                margin-right: 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .session-detail {
+            margin-left: 2rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+
+            .detail-icon {
+                margin-right: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            &.checkin {
+                color: #52c41a;
+
+                .detail-icon {
+                    color: #52c41a;
+                }
+            }
+
+            &.checkout {
+                color: #f5222d;
+
+                .detail-icon {
+                    color: #f5222d;
+                }
+            }
+
+            &.hours {
+                color: #fa8c16;
+
+                .detail-icon {
+                    color: #fa8c16;
+                }
+            }
+        }
+
+        &.current-session {
+            border-left-color: #52c41a;
+            background-color: #f6ffed;
+
+            .session-title {
+                color: #52c41a;
+            }
+        }
+    }
+}
+
+/* Checkin/out buttons */
+.checkinout-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 576px) {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .ant-btn {
+        flex: 1;
+        height: 2.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        .anticon {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 576px) {
+            width: 100%;
+        }
+
+        &.checkin-btn {
+            background-color: #52c41a;
+            border-color: #52c41a;
+            color: white;
+
+            &:hover {
+                background-color: #73d13d;
+                border-color: #73d13d;
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+
+        &.checkout-btn {
+            background-color: #f5222d;
+            border-color: #f5222d;
+            color: white;
+
+            &:hover {
+                background-color: #ff4d4f;
+                border-color: #ff4d4f;
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+/* Attendance table */
+.attendance-table {
+    margin-top: 1.5rem;
+
+    .ant-table {
+        font-size: 0.9rem;
+        border-radius: 8px;
+        overflow: hidden;
+
+        @media (max-width: 992px) {
+            font-size: 0.8rem;
+        }
+
+        .ant-table-thead>tr>th {
+            background-color: #f0f2f5;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ant-table-tbody>tr>td {
+            transition: all 0.2s;
+        }
+
+        .ant-table-tbody>tr:hover>td {
+            background-color: #fafafa;
+        }
+    }
+
+    .ant-pagination {
+        margin-top: 1rem;
+    }
+}
+
+/* Date picker */
+.month-picker {
+    margin-bottom: 1rem;
+
+    .ant-picker {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 6px;
+    }
+}
+
+/* Status messages */
+.status-message {
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+
+    &.loading {
+        background-color: #e6f7ff;
+        color: #1890ff;
+    }
+
+    &.error {
+        background-color: #fff1f0;
+        color: #f5222d;
+    }
+
+    &.empty {
+        background-color: #f6ffed;
+        color: #52c41a;
+    }
+}

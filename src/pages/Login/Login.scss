@@ -1,0 +1,58 @@
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    font-family: 'Inter', sans-serif;
+}
+
+.login-bg {
+    position: absolute;
+    inset: 0;
+    background: url("https://source.unsplash.com/featured/?cafe") no-repeat center center;
+    background-size: cover;
+    filter: blur(4px) brightness(0.8);
+    z-index: 0;
+}
+
+.login-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.login-title {
+    text-align: center;
+    color: #333;
+    font-weight: 600;
+}
+
+.login-logo {
+    display: block;
+    margin: 0 auto 16px;
+    width: 60px;
+}
+
+.login-btn {
+    background: #722ed1;
+    border-color: #722ed1;
+    font-weight: bold;
+    transition: 0.3s;
+
+    &:hover {
+        background: #9254de !important;
+        border-color: #9254de !important;
+    }
+}
+
+.ant-form-item-label>label {
+    font-weight: 500;
+    color: #444;
+}

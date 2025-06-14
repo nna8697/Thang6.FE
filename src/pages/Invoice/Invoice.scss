@@ -1,0 +1,37 @@
+.order-list {
+    padding: 20px;
+
+    .order-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+
+        .ant-select,
+        .ant-picker-range {
+            min-width: 200px;
+        }
+    }
+
+    .ant-table {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .ant-tag {
+        font-weight: 500;
+    }
+
+    .ant-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .ant-modal .ant-select,
+    .ant-modal .ant-input,
+    .ant-modal .ant-input-textarea {
+        margin-top: 10px;
+    }
+}
