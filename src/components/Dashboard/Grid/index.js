@@ -67,9 +67,6 @@ function Grid() {
         const controller = new AbortController();
         const [fromDate, toDate] = getDateRange();
 
-        // fetch(`http://localhost:2025/api/dashboard/stats?from=${fromDate.format("YYYY-MM-DD")}&to=${toDate.format("YYYY-MM-DD")}`, {
-        //     signal: controller.signal
-        // })
         fetch(`${API_DOMAIN}api/dashboard/stats?from=${fromDate.format("YYYY-MM-DD")}&to=${toDate.format("YYYY-MM-DD")}`, {
             signal: controller.signal
         })
@@ -166,16 +163,6 @@ function Grid() {
                 <Col xxl={16}>
                     <CardItem title="Báo cáo thống kê 7 ngày trước" >
                         <Last7DaysRevenueChart></Last7DaysRevenueChart>
-                        {/* http://localhost:2025/api/revenue/last-7-days */}
-                        {/* [
-  { "date": "2025-05-04", "revenue": 0 },
-  { "date": "2025-05-05", "revenue": 25000 },
-  { "date": "2025-05-06", "revenue": 0 },
-  { "date": "2025-05-07", "revenue": 0 },
-  { "date": "2025-05-08", "revenue": 137000 },
-  { "date": "2025-05-09", "revenue": 0 },
-  { "date": "2025-05-10", "revenue": 25000 }
-] */}
                     </CardItem>
                 </Col>
                 <Col xxl={8}><CardItem title="Top 10 mặt hàng bán chạy" style={{ height: "400px" }} /></Col>

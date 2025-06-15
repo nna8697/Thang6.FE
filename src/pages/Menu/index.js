@@ -7,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import { getAllCategories } from "../../services/categoriesService";
 import { getAllProducts, updateProduct, createProduct, deleteProduct } from "../../services/productsService";
+import { API_DOMAIN } from '../../config';
+
 
 const { Option } = Select;
 
@@ -23,9 +25,6 @@ const Menu = () => {
     // Fetch categories from API
     const fetchCategories = async () => {
         try {
-            // const res = await fetch("http://localhost:2025/api/categories");
-            // const json = await res.json();
-            
             const res = await getAllCategories();
             setCategories(res);
         } catch (err) {
@@ -36,8 +35,6 @@ const Menu = () => {
     // Fetch products from API
     const fetchProducts = async () => {
         try {
-            // const res = await fetch("http://localhost:2025/api/products");
-            // const res = await getAllProducts();
             const json = await getAllProducts();
             const formatted = json.map((item) => ({
                 key: item.id.toString(),
@@ -70,7 +67,7 @@ const Menu = () => {
     });
 
     const handleCreateOrUpdate = async (values) => {
-        
+
         const formData = new FormData();
         formData.append('name', values.name);
         formData.append('categoryId', categories.find(cat => cat.name === values.category)?.id);
@@ -81,33 +78,11 @@ const Menu = () => {
             formData.append('image', values.image[0].originFileObj);
         }
 
-        // var obj = {
-        //     name: values.name,
-        //     categoryId: categories.find(cat => cat.name === values.category)?.id,
-        //     price: values.price.replace(/\D/g, ""),
-        //     status: values.status,
-        //     image: values.image && values.image.length > 0 ? values.image[0].name : null,
-        // };
-
-        // const obj = values;
-        // if (values.image && values.image[0].name) {
-        //     obj.image = values.image[0].name;
-        // }
         try {
             if (isEdit && editingItem) {
-                // await fetch(`http://localhost:2025/api/products/${editingItem.id}`, {
-                //     method: "PUT",
-                //     body: formData,
-                // });
                 await updateProduct(editingItem.id, formData);
                 message.success("Cập nhật món thành công!");
             } else {
-                // 
-                // await fetch("http://localhost:2025/api/products", {
-                //     method: "POST",
-                //     body: formData,
-                // });
-
                 await createProduct(formData);
 
                 message.success("Đã thêm món mới!");
@@ -138,7 +113,7 @@ const Menu = () => {
                     uid: '-1',
                     name: 'image.png',
                     status: 'done',
-                    url: "http://localhost:2025" + item.imgLink,
+                    url: `${API_DOMAIN}` + item.imgLink,
                 },
             ],
         });
@@ -148,9 +123,6 @@ const Menu = () => {
 
     const handleDelete = async (key) => {
         try {
-            // await fetch(`http://localhost:2025/api/products/${key}`, {
-            //     method: "DELETE",
-            // });
             await deleteProduct(key);
             message.success("Đã xoá món!");
             fetchProducts();
@@ -166,7 +138,7 @@ const Menu = () => {
             key: "imgLink",
             render: (imgLink) => (
                 <img
-                    src={imgLink ? "http://localhost:2025" + imgLink : "https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg"}
+                    src={imgLink ? `${API_DOMAIN}` + imgLink : "https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg"}
                     alt="Hình ảnh món"
                     style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
                 />

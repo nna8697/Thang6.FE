@@ -13,9 +13,6 @@ import { updateInvoice, createInvoice } from '../../services/invoicesService';
 
 const getProducts = async () => {
     try {
-        // const res = await fetch("http://localhost:2025/api/products");
-        // const res = await getAllProducts();
-        // if (!res.ok) throw new Error("Fetch products failed");
         return await getAllProducts();
     } catch (err) {
         console.error("Error fetching products", err);

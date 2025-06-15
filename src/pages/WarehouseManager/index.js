@@ -31,18 +31,6 @@ const WarehouseManager = () => {
 
     const fetchData = async () => {
         try {
-            // const [logsRes, ingredientsRes, toolsRes] = await Promise.all([
-            //     fetch('http://localhost:2025/api/warehouse'),
-            //     fetch('http://localhost:2025/api/ingredients'),
-            //     fetch('http://localhost:2025/api/tools')
-            // ]);
-
-            // const [logsRes, ingredientsRes, toolsRes] = await Promise.all([
-            //     getAllWarehouse(),
-            //     getAllIngredient(),
-            //     getAllTools(),
-            // ])
-
             const [logsData, ingredientsData, toolsData] = await Promise.all([
                 getAllWarehouse(),
                 getAllIngredient(),
@@ -80,13 +68,6 @@ const WarehouseManager = () => {
         try {
             // const table = type === 'ingredient' ? 'ingredients' : 'tools';
             const diff = quantity - oldQuantity;
-
-            // await fetch(`http://localhost:2025/api/${table}/update-quantity`, {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ name, quantity: diff }),
-            // });
-
             type === 'ingredient' ? await updateIngredientQuantity(name, { quantity: diff }) : await updateToolQuantity(name, { quantity: diff });
 
         } catch (err) {
@@ -101,12 +82,6 @@ const WarehouseManager = () => {
             const payload = { ...values, date: values.date.format('YYYY-MM-DD') };
 
             if (editingId) {
-                // await fetch(`http://localhost:2025/api/warehouse/${editingId}`, {
-                //     method: 'PUT',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(payload),
-                // });
-
                 await updateWarehouse(editingId, payload);
 
                 await updateStock({
@@ -117,12 +92,6 @@ const WarehouseManager = () => {
                 });
                 message.success('Đã cập nhật phiếu và tồn kho');
             } else {
-                // await fetch('http://localhost:2025/api/warehouse', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(payload),
-                // });
-
                 await createWarehouse(payload);
 
                 await updateStock({
@@ -195,8 +164,6 @@ const WarehouseManager = () => {
 
     const handleDelete = async (id, record) => {
         try {
-            // await fetch(`http://localhost:2025/api/warehouse/${id}`, { method: 'DELETE' });
-
             await deleteWarehouse(id);
 
             await updateStock({

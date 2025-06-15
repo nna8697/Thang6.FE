@@ -23,16 +23,6 @@ const Timekeeping = () => {
     const fetchData = async (month, year) => {
         setLoading(true);
         try {
-            // const res = await fetch(`http://localhost:2025/api/timekeeping?month=${month}&year=${year}`, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`
-            //     }
-            // });
-
-            // const res = await getTimekeepingByMonth(month, year);
-
-            // if (!res.ok) throw new Error('Không thể tải dữ liệu chấm công');
-
             const { users, timekeeping } = await getTimekeepingByMonth(month, year);
 
             const daysInMonth = dayjs(`${year}-${month}-01`).daysInMonth();
@@ -188,27 +178,6 @@ const Timekeeping = () => {
 
             if (confirmResult.isConfirmed) {
                 // Gọi API cập nhật
-                // const response = await fetch('http://localhost:2025/api/timekeeping', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'Authorization': `Bearer ${getCookie('token')}`
-                //     },
-                //     body: JSON.stringify({
-                //         userId: targetUserId,       // ID nhân viên được chỉnh sửa
-                //         workDate,                  // Ngày làm việc
-                //         hoursWorked: value,        // Số giờ công
-                //         fullname: targetFullname, // Tên nhân viên
-                //         currentUserId             // ID người đang thao tác
-                //     })
-                // });
-
-                // const result = await response.json();
-
-                // if (!response.ok || !result.success) {
-                //     throw new Error(result.message || 'Cập nhật thất bại');
-                // }
-
                 var obj = {
                     userId: targetUserId,       // ID nhân viên được chỉnh sửa
                     workDate,                  // Ngày làm việc

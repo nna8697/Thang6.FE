@@ -12,9 +12,6 @@ const ToolManager = () => {
 
     const fetchTools = async () => {
         try {
-            // const res = await fetch('http://localhost:2025/api/tools');
-            // if (!res.ok) throw new Error('Fetch tools failed');
-            // const data = await res.json();
             const data = await getAllTools();
             setTools(data);
         } catch (err) {
@@ -30,17 +27,6 @@ const ToolManager = () => {
     const handleOk = async () => {
         const values = await form.validateFields();
         try {
-            // const url = editingId
-            //     ? `http://localhost:2025/api/tools/${editingId}`
-            //     : 'http://localhost:2025/api/tools';
-            // const method = editingId ? 'PUT' : 'POST';
-            // const res = await fetch(url, {
-            //     method,
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(values),
-            // });
-            // if (!res.ok) throw new Error('Save failed');
-
             if (editingId) {
                 const res = await updateTool(editingId, values);
                 if (!res) throw new Error('Update failed');
@@ -68,10 +54,6 @@ const ToolManager = () => {
 
     const handleDelete = async (id) => {
         try {
-            // const res = await fetch(`http://localhost:2025/api/tools/${id}`, {
-            //     method: 'DELETE',
-            // });
-            // if (!res.ok) throw new Error('Delete failed');
             await deleteTool(id);
             message.success('Đã xoá dụng cụ');
             fetchTools();

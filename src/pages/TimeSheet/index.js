@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { getCookie } from '../../helpers/cookies';
 import { LoginOutlined, LogoutOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import './workSession.scss';
+import { API_DOMAIN } from '../../config';
 
 const { Text } = Typography;
 
@@ -24,8 +25,8 @@ const TimeSheet = () => {
         setLoading(true);
         try {
             const [employeesRes, attendanceRes] = await Promise.all([
-                fetch("http://localhost:2025/api/users/employees"),
-                fetch(`http://localhost:2025/api/attendance/month?month=${selectedMonth.month() + 1}&year=${selectedMonth.year()}`)
+                fetch(`${API_DOMAIN}/api/users/employees`),
+                fetch(`${API_DOMAIN}/api/attendance/month?month=${selectedMonth.month() + 1}&year=${selectedMonth.year()}`)
             ]);
 
             const employeesJson = await employeesRes.json();
@@ -132,7 +133,7 @@ const TimeSheet = () => {
 
     const handleCheckIn = async () => {
         try {
-            const response = await fetch(`http://localhost:2025/api/attendance/checkin`, {
+            const response = await fetch(`${API_DOMAIN}/api/attendance/checkin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ employeeId: userId, fullname })
@@ -152,7 +153,7 @@ const TimeSheet = () => {
 
     const handleCheckOut = async () => {
         try {
-            const response = await fetch(`http://localhost:2025/api/attendance/checkout`, {
+            const response = await fetch(`${API_DOMAIN}/api/attendance/checkout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ employeeId: userId })

@@ -14,7 +14,6 @@ const IngredientManager = () => {
 
     const fetchIngredients = async () => {
         try {
-            // const res = await fetch('http://localhost:2025/api/ingredients');
             const data = await getAllIngredient();
             setIngredients(data);
         } catch (err) {
@@ -30,16 +29,6 @@ const IngredientManager = () => {
     const handleOk = async () => {
         const values = await form.validateFields();
         try {
-            // const url = editingId
-            //     ? `http://localhost:2025/api/ingredients/${editingId}`
-            //     : 'http://localhost:2025/api/ingredients';
-            // const method = editingId ? 'PUT' : 'POST';
-            // const res = await fetch(url, {
-            //     method,
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(values),
-            // });
-            // if (!res.ok) throw new Error('Save failed');
             if (editingId) {
                 const res = await updateIngredient(editingId, values);
                 if (!res) throw new Error('Update failed');

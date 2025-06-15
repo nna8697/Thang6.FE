@@ -1,6 +1,7 @@
 import React from 'react';
 import './ProductGrid.scss';
 import { Col, Row } from 'antd';
+import { API_DOMAIN } from '../../config';
 
 const ProductGrid = ({ products, onAddToCart }) => (
     <div className="product-grid">
@@ -15,7 +16,7 @@ const ProductGrid = ({ products, onAddToCart }) => (
                             <img
                                 src={
                                     product.imgLink
-                                        ? `http://localhost:2025${product.imgLink}`
+                                        ? `${API_DOMAIN}${product.imgLink}`
                                         : 'https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg'
                                 }
                                 alt={product.name}
