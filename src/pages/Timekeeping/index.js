@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Table, DatePicker, InputNumber, Button, message } from 'antd';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
@@ -19,6 +19,74 @@ const Timekeeping = () => {
     const fullname = getCookie('fullname');
     const role = getCookie('role'); // admin, user
     const token = getCookie('token');
+
+    // Hàm debounce
+    const debounce = (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    };
+
+    // Tạo phiên bản debounce của handleChange
+    const debouncedHandleChange = useCallback(
+        debounce(async (value, targetUserId, workDate, targetFullname) => {
+            try {
+                // Lấy thông tin người đang thao tác từ cookie
+                const currentUserId = getCookie('id');
+                const currentUserFullname = getCookie('fullname');
+
+                // Hiển thị dialog xác nhận
+                const confirmResult = await Swal.fire({
+                    title: 'Xác nhận thay đổi',
+                    html: `Bạn <b>${currentUserFullname}</b> đang cập nhật giờ công cho <b>${targetFullname}</b><br>
+                          Ngày ${dayjs(workDate).format('DD/MM/YYYY')} thành <b>${value} giờ</b>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy bỏ',
+                    focusConfirm: false,
+                    allowOutsideClick: () => !Swal.isLoading()
+                });
+
+                if (confirmResult.isConfirmed) {
+                    // Gọi API cập nhật
+                    var obj = {
+                        userId: targetUserId,       // ID nhân viên được chỉnh sửa
+                        workDate,                  // Ngày làm việc
+                        hoursWorked: value,        // Số giờ công
+                        fullname: targetFullname,  // Tên nhân viên
+                        currentUserId              // ID người đang thao tác
+                    };
+
+                    const result = await createTimekeeping(obj);
+                    // Thông báo thành công
+                    await Swal.fire({
+                        title: 'Thành công!',
+                        text: result.message,
+                        icon: 'success',
+                        timer: 1500
+                    });
+
+                    // Làm mới dữ liệu
+                    fetchData(selectedMonth.month() + 1, selectedMonth.year());
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật:', error);
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: error.message,
+                    icon: 'error'
+                });
+            }
+        }, 1000), // Thời gian chờ 500ms
+        [selectedMonth]
+    );
 
     const fetchData = async (month, year) => {
         setLoading(true);
@@ -91,7 +159,18 @@ const Timekeeping = () => {
                                         max={24}
                                         step={0.5}
                                         value={value}
-                                        onChange={(val) => handleChange(val, record.userId, dateStr, record.fullname)}
+                                        onChange={(val) => {
+                                            // Cập nhật giá trị ngay lập tức để hiển thị
+                                            const newData = [...data];
+                                            const recordIndex = newData.findIndex(item => item.userId === record.userId);
+                                            if (recordIndex !== -1) {
+                                                newData[recordIndex][dateStr] = val;
+                                                setData(newData);
+                                            }
+
+                                            // Gọi hàm debounce
+                                            debouncedHandleChange(val, record.userId, dateStr, record.fullname);
+                                        }}
                                         style={{ width: '100%' }}
                                     />
                                 ) : (
@@ -154,57 +233,6 @@ const Timekeeping = () => {
             message.error('Không thể tải dữ liệu chấm công.');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleChange = async (value, targetUserId, workDate, targetFullname) => {
-        try {
-            // Lấy thông tin người đang thao tác từ cookie
-            const currentUserId = getCookie('id');
-            const currentUserFullname = getCookie('fullname');
-
-            // Hiển thị dialog xác nhận
-            const confirmResult = await Swal.fire({
-                title: 'Xác nhận thay đổi',
-                html: `Bạn <b>${currentUserFullname}</b> đang cập nhật giờ công cho <b>${targetFullname}</b><br>
-                      Ngày ${dayjs(workDate).format('DD/MM/YYYY')} thành <b>${value} giờ</b>`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Xác nhận',
-                cancelButtonText: 'Hủy bỏ',
-                focusConfirm: false,
-                allowOutsideClick: () => !Swal.isLoading()
-            });
-
-            if (confirmResult.isConfirmed) {
-                // Gọi API cập nhật
-                var obj = {
-                    userId: targetUserId,       // ID nhân viên được chỉnh sửa
-                    workDate,                  // Ngày làm việc
-                    hoursWorked: value,        // Số giờ công
-                    fullname: targetFullname, // Tên nhân viên
-                    currentUserId             // ID người đang thao tác
-                };
-
-                const result = await createTimekeeping(obj);
-                // Thông báo thành công
-                await Swal.fire({
-                    title: 'Thành công!',
-                    text: result.message,
-                    icon: 'success',
-                    timer: 1500
-                });
-
-                // Làm mới dữ liệu
-                fetchData(selectedMonth.month() + 1, selectedMonth.year());
-            }
-        } catch (error) {
-            console.error('Lỗi khi cập nhật:', error);
-            Swal.fire({
-                title: 'Lỗi!',
-                text: error.message,
-                icon: 'error'
-            });
         }
     };
 
