@@ -35,7 +35,7 @@ function MenuSider() {
     // }, []);
 
     // const isAdmin = role === 'admin';
-    //debugger
+    //
     const role = useSelector(state => state.loginReducer.user?.role);
     const isAdmin = role === 0;
 

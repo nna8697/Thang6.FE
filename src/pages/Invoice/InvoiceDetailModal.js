@@ -15,6 +15,8 @@ const statusMap = {
 };
 
 const InvoiceDetailModal = ({ order, onClose }) => {
+
+
     if (!order) return null;
 
     const {
@@ -27,6 +29,8 @@ const InvoiceDetailModal = ({ order, onClose }) => {
         deletedReason,
         orders = [],
     } = order;
+
+    debugger
 
     const columns = [
         {

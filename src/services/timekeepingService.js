@@ -6,6 +6,6 @@ export const getTimekeepingByMonth = async (month, year) => {
 }
 
 export const createTimekeeping = async (data) => {
-    debugger
+
     return await post("api/timekeeping", data);
 };

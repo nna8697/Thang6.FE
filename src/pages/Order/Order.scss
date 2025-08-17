@@ -175,3 +175,33 @@
         border: 1px solid #ccc;
     }
 }
+
+.note-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+
+    label {
+        font-weight: bold;
+        font-size: 14px;
+        color: #333;
+    }
+
+    textarea {
+        resize: none;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        font-family: inherit;
+        min-height: 60px;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: #1677ff;
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+        }
+    }
+}

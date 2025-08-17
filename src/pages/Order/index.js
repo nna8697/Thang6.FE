@@ -10,7 +10,6 @@ import { getAllProducts } from '../../services/productsService';
 import { getCookie } from '../../helpers/cookies';
 import { updateInvoice, createInvoice } from '../../services/invoicesService';
 
-
 const getProducts = async () => {
     try {
         return await getAllProducts();
@@ -42,6 +41,8 @@ const Order = () => {
     const [discountValue, setDiscountValue] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [loading, setLoading] = useState(false);
+    //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
+    const [note, setNote] = useState(""); // 🟢 Ghi chú
 
     const location = useLocation();
     const { order } = location.state || {};
@@ -96,6 +97,8 @@ const Order = () => {
                 setDiscountType(order.discountType || '%');
                 setDiscountValue(order.discountValue || 0);
                 setPaymentMethod(order.paymentmethod === 0 ? "cash" : "transfer");
+                //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
+                setNote(order.note || ""); // 🟢 Nạp ghi chú
             }
         };
 
@@ -142,6 +145,8 @@ const Order = () => {
             discountValue,
             discountAmount: discountAmount.toFixed(2),
             editedReason: order?.editedReason || null,
+            //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
+            note: note || null // 🟢 Gửi ghi chú
         };
 
         if (!order) {
@@ -156,7 +161,6 @@ const Order = () => {
                 ? await updateInvoice(order.id, invoiceData)
                 : await createInvoice(invoiceData);
 
-            debugger
             if (result?.success || result?.id || result?.data || result?.message === "Updated") {
                 // ✅ Gửi dữ liệu sang PrintServer qua WebSocket nếu là hóa đơn mới
                 if (!order && socketRef.current?.readyState === WebSocket.OPEN) {
@@ -171,7 +175,9 @@ const Order = () => {
                             total,
                             user: getCookie('fullname'),
                             paymentMethod,
-                            createdAt: new Date().toLocaleString('vi-VN')
+                            createdAt: new Date().toLocaleString('vi-VN'),
+                            //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
+                            note
                         }
                     }));
                 }
@@ -190,6 +196,8 @@ const Order = () => {
                 setCart([]);
                 setDiscountValue(0);
                 setShowDiscountInput(false);
+                //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
+                setNote(""); // reset ghi chú
             } else {
                 message.error(`${order ? 'Sửa' : 'Thanh toán'} thất bại: ${result.message || 'Lỗi không xác định'}`);
             }
@@ -305,6 +313,17 @@ const Order = () => {
                                     <option value="cash">Tiền mặt</option>
                                     <option value="transfer">Chuyển khoản</option>
                                 </select>
+                            </div>
+                            {/* 15.8.2025 nnanh bổ sung tính năng thêm ghi chú */}
+                            {/* Ô Ghi chú */}
+                            <div className="note-section">
+                                <label htmlFor="note">Ghi chú:</label>
+                                <textarea
+                                    id="note"
+                                    placeholder="Nhập ghi chú cho hóa đơn..."
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                />
                             </div>
 
                             <div className="cart-total">

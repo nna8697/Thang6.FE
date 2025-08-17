@@ -37,7 +37,7 @@ const IngredientManager = () => {
                 const res = await createIngredient(values);
                 if (!res) throw new Error('Create failed');
             }
-            debugger
+
             message.success(editingId ? 'Đã cập nhật nguyên liệu' : 'Đã thêm nguyên liệu');
             form.resetFields();
             setVisible(false);

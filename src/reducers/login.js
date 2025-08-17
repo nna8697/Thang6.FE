@@ -17,7 +17,7 @@ const initialState = {
 };
 
 const loginReducer = (state = initialState, action) => {
-    //debugger
+    //
     console.log(initialState, action);
 
     switch (action.type) {

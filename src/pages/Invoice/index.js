@@ -49,7 +49,8 @@ const Invoice = () => {
                     creator: `${item.fullname}`,
                     createdAt: item.createddate,
                     status: item.status,
-                    orders: item.orders,
+                    // Ép orders luôn thành mảng để tránh lỗi .some is not a function
+                    orders: Array.isArray(item.orders) ? item.orders : [],
                     paymentmethod: item.paymentmethod,
                 }));
                 setOrders(formatted);
@@ -146,8 +147,7 @@ const Invoice = () => {
         }
 
         try {
-            const result = await deleteInvoice(selectedDeleteOrder.id, deleteReason);
-
+            await deleteInvoice(selectedDeleteOrder.id, deleteReason);
             const updatedOrders = orders.map(o =>
                 o.id === selectedDeleteOrder.id
                     ? { ...o, status: 1, deletedReason: deleteReason }
@@ -159,7 +159,7 @@ const Invoice = () => {
             message.success('Hoá đơn đã được xoá thành công.');
         } catch (err) {
             console.error('Delete invoice failed:', err);
-            message.error('Không thể xoá hoá đơn.'); 
+            message.error('Không thể xoá hoá đơn.');
         }
     };
 
@@ -209,7 +209,6 @@ const Invoice = () => {
             title: 'Tổng tiền',
             dataIndex: 'total',
             render: val => val.toLocaleString('vi-VN') + '₫',
-            //set data căn lề phải
             align: 'right',
         },
         {
