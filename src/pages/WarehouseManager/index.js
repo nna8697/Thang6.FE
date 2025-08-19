@@ -68,7 +68,7 @@ const WarehouseManager = () => {
         try {
             // const table = type === 'ingredient' ? 'ingredients' : 'tools';
             const diff = quantity - oldQuantity;
-            type === 'ingredient' ? await updateIngredientQuantity(name, { quantity: diff }) : await updateToolQuantity(name, { quantity: diff });
+            type === 'ingredient' ? await updateIngredientQuantity(name, { quantity: diff, name: name }) : await updateToolQuantity(name, { quantity: diff });
 
         } catch (err) {
             console.error('Cập nhật tồn kho thất bại', err);
@@ -83,7 +83,7 @@ const WarehouseManager = () => {
 
             if (editingId) {
                 await updateWarehouse(editingId, payload);
-
+                
                 await updateStock({
                     type: payload.type,
                     name: payload.name,
