@@ -17,6 +17,8 @@ function LayoutDefault() {
     const navigate = useNavigate();
 
     const token = getCookie("token");
+
+    const userName = getCookie("fullname");
     // token = 123;
     const isLogin = useSelector(state => state.loginReducer);
 
@@ -42,10 +44,11 @@ function LayoutDefault() {
                             <MenuUnfoldOutlined />
                         </div>
                         <div className="header__search">
-                            <SearchOutlined />
+                            {/* <SearchOutlined /> */}
                         </div>
                     </div>
                     <div className="header__nav-right">
+                        Xin chào, <b>{userName}</b>
                         <Notify />
                         <NavLink to="/Logout" className="layout-default__search">Đăng xuất</NavLink>
                     </div>
