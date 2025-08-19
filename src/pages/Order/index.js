@@ -45,6 +45,7 @@ const Order = () => {
     const [note, setNote] = useState(""); // 🟢 Ghi chú
 
     const location = useLocation();
+    debugger
     const { order } = location.state || {};
     const { subtotal, discountAmount, total } = useCartTotals(cart, discountType, discountValue);
     const userId = getCookie('id');

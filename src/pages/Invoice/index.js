@@ -50,7 +50,7 @@ const Invoice = () => {
                     createdAt: item.createddate,
                     status: item.status,
                     // Ép orders luôn thành mảng để tránh lỗi .some is not a function
-                    orders: Array.isArray(item.orders) ? item.orders : [],
+                    orders: Array.isArray(item.orders) ? item.orders : JSON.parse(item.orders),
                     paymentmethod: item.paymentmethod,
                 }));
                 setOrders(formatted);
