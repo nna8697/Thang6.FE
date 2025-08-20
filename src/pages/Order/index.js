@@ -3,12 +3,13 @@ import './Order.scss';
 import ProductGrid from '../../components/ProductGrid';
 import { Col, Row, message } from 'antd';
 import { DeleteOutlined, PlusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { getAllCategories } from '../../services/categoriesService';
 import { getAllProducts } from '../../services/productsService';
 import { getCookie } from '../../helpers/cookies';
 import { updateInvoice, createInvoice } from '../../services/invoicesService';
+
 
 const getProducts = async () => {
     try {
@@ -42,17 +43,18 @@ const Order = () => {
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [loading, setLoading] = useState(false);
     //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-    const [note, setNote] = useState(""); // 🟢 Ghi chú
+    const [note, setNote] = useState(""); // Ghi chú
 
     const location = useLocation();
-    debugger
+    const navigate = useNavigate();
+
     const { order } = location.state || {};
     const { subtotal, discountAmount, total } = useCartTotals(cart, discountType, discountValue);
     const userId = getCookie('id');
 
     const socketRef = useRef(null);
 
-    // 🟢 Khởi tạo WebSocket
+    // Khởi tạo WebSocket
     useEffect(() => {
         socketRef.current = new WebSocket("ws://localhost:5000");
 
@@ -73,7 +75,7 @@ const Order = () => {
         };
     }, []);
 
-    // 🟡 Load dữ liệu ban đầu
+    //  Load dữ liệu ban đầu
     useEffect(() => {
         const fetchData = async () => {
             const [categoryData, productData] = await Promise.all([
@@ -99,7 +101,7 @@ const Order = () => {
                 setDiscountValue(order.discountValue || 0);
                 setPaymentMethod(order.paymentmethod === 0 ? "cash" : "transfer");
                 //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-                setNote(order.note || ""); // 🟢 Nạp ghi chú
+                setNote(order.note || ""); // Nạp ghi chú
             }
         };
 
@@ -147,7 +149,7 @@ const Order = () => {
             discountAmount: discountAmount.toFixed(2),
             editedReason: order?.editedReason || null,
             //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-            note: note || null // 🟢 Gửi ghi chú
+            note: note || null // Gửi ghi chú
         };
 
         if (!order) {
@@ -163,8 +165,9 @@ const Order = () => {
                 : await createInvoice(invoiceData);
 
             if (result?.success || result?.id || result?.data || result?.message === "Updated") {
-                // ✅ Gửi dữ liệu sang PrintServer qua WebSocket nếu là hóa đơn mới
-                if (!order && socketRef.current?.readyState === WebSocket.OPEN) {
+                // Gửi dữ liệu sang PrintServer qua WebSocket 
+                //20.8.2025 fixbug in được hoá đơn đã chỉnh sửa
+                if (socketRef.current?.readyState === WebSocket.OPEN) {
                     socketRef.current.send(JSON.stringify({
                         type: 'print',
                         invoice: {
@@ -199,6 +202,10 @@ const Order = () => {
                 setShowDiscountInput(false);
                 //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
                 setNote(""); // reset ghi chú
+                //20.8.2025 Fix bug khi lưu lại thành công chỉnh sửa" THÌ xoá hoá đơn cũ đi
+                if (order) {
+                    navigate('/order'); // load lại trang Order mà không truyền order cũ
+                }
             } else {
                 message.error(`${order ? 'Sửa' : 'Thanh toán'} thất bại: ${result.message || 'Lỗi không xác định'}`);
             }

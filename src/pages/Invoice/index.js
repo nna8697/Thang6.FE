@@ -45,7 +45,7 @@ const Invoice = () => {
                     id: item.id,
                     code: `HD${String(item.id).padStart(3, '0')}`,
                     total: parseFloat(item.total),
-                    discount: 0,
+                    discount: parseFloat(item.discountAmount || 0), //nnanh fix bug không hiển thị giảm giá
                     creator: `${item.fullname}`,
                     createdAt: item.createddate,
                     status: item.status,
