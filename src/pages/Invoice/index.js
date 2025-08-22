@@ -6,7 +6,7 @@ import './Invoice.scss';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getAllInvoices, deleteInvoice } from '../../services/invoicesService';
+import { getAllInvoices, deleteInvoice, getInvoices } from '../../services/invoicesService';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -21,7 +21,6 @@ const Invoice = () => {
     const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
-    const [filteredOrders, setFilteredOrders] = useState([]);
     const [statusFilter, setStatusFilter] = useState(null);
     const [dateRange, setDateRange] = useState([dayjs(), dayjs()]);
     const [selectedDateFilter, setSelectedDateFilter] = useState('today');
@@ -37,39 +36,54 @@ const Invoice = () => {
     const [editReasonOption, setEditReasonOption] = useState('');
     const [selectedEditOrder, setSelectedEditOrder] = useState(null);
 
-    useEffect(() => {
-        const fetchInvoices = async () => {
-            try {
-                const data = await getAllInvoices();
-                const formatted = data.map(item => ({
-                    id: item.id,
-                    code: `HD${String(item.id).padStart(3, '0')}`,
-                    total: parseFloat(item.total),
-                    discount: parseFloat(item.discountAmount || 0), //nnanh fix bug không hiển thị giảm giá
-                    creator: `${item.fullname}`,
-                    createdAt: item.createddate,
-                    status: item.status,
-                    // Ép orders luôn thành mảng để tránh lỗi .some is not a function
-                    orders: Array.isArray(item.orders) ? item.orders : JSON.parse(item.orders),
-                    paymentmethod: item.paymentmethod,
-                }));
-                setOrders(formatted);
-            } catch (err) {
-                console.error('Fetch invoices failed:', err);
-                message.error('Không thể tải hoá đơn');
-            }
-        };
+    // Hàm fetch invoices
+    const fetchInvoices = async (filterType = 'today', range = []) => {
+        try {
+            let params = {};
 
-        fetchInvoices();
+            if (filterType === 'custom' && range.length === 2) {
+                params = {
+                    type: 'custom',
+                    start: range[0].format('YYYY-MM-DD'),
+                    end: range[1].format('YYYY-MM-DD'),
+                };
+            } else {
+                params = { type: filterType };
+            }
+
+            const data = await getInvoices(params);
+
+            const formatted = data.map(item => ({
+                id: item.id,
+                code: `HD${String(item.id).padStart(3, '0')}`,
+                total: parseFloat(item.total),
+                discount: parseFloat(item.discountAmount || 0),
+                creator: `${item.fullname}`,
+                createdAt: item.createddate,
+                status: item.status,
+                orders: Array.isArray(item.orders) ? item.orders : JSON.parse(item.orders),
+                paymentmethod: item.paymentmethod,
+            }));
+            setOrders(formatted);
+        } catch (err) {
+            console.error('Fetch invoices failed:', err);
+            message.error('Không thể tải hoá đơn');
+        }
+    };
+
+    // Khi load lần đầu: mặc định today
+    useEffect(() => {
+        fetchInvoices('today');
     }, []);
 
+    // Khi đổi filter ngày
     useEffect(() => {
-        updateDateRange(selectedDateFilter);
-    }, [selectedDateFilter]);
-
-    useEffect(() => {
-        filterOrders();
-    }, [orders, statusFilter, dateRange]);
+        if (selectedDateFilter === 'custom') {
+            fetchInvoices('custom', dateRange);
+        } else {
+            fetchInvoices(selectedDateFilter);
+        }
+    }, [selectedDateFilter, dateRange]);
 
     const updateDateRange = (key) => {
         const today = dayjs();
@@ -115,19 +129,6 @@ const Invoice = () => {
         }
 
         setDateRange([start, end]);
-    };
-
-    const filterOrders = () => {
-        const [start, end] = dateRange;
-
-        const filtered = orders.filter(order => {
-            const orderDate = dayjs(order.createdAt);
-            const matchDate = orderDate.isAfter(start) && orderDate.isBefore(end);
-            const matchStatus = statusFilter === null || order.status === statusFilter;
-            return matchDate && matchStatus;
-        });
-
-        setFilteredOrders(filtered);
     };
 
     const handleDelete = (order) => {
@@ -263,7 +264,10 @@ const Invoice = () => {
                 <Select
                     style={{ width: 200 }}
                     value={selectedDateFilter}
-                    onChange={setSelectedDateFilter}
+                    onChange={(val) => {
+                        setSelectedDateFilter(val);
+                        updateDateRange(val);
+                    }}
                 >
                     <Option value="today">Hôm nay</Option>
                     <Option value="yesterday">Hôm qua</Option>
@@ -296,9 +300,9 @@ const Invoice = () => {
 
             <Table
                 columns={columns}
-                dataSource={filteredOrders}
+                dataSource={orders.filter(o => statusFilter === null || o.status === statusFilter)}
                 rowKey="id"
-                pagination={{ pageSize: 10 }}
+                pagination={{ pageSize: 15 }}
             />
 
             <Modal

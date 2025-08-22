@@ -5,6 +5,12 @@ export const getAllInvoices = async () => {
     return result;
 }
 
+export const getInvoices = async (params) => {
+    debugger
+    const result = await post("api/invoices/getInvoices", params);
+    return result;
+}
+
 export const deleteInvoice = async (id, reason) => {
     return await del(`api/invoices/${id}`, {
         reason,

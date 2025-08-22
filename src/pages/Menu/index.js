@@ -233,7 +233,7 @@ const Menu = () => {
             <Table
                 columns={columns}
                 dataSource={filteredData}
-                pagination={{ pageSize: 5 }}
+                pagination={{ pageSize: 15 }}
             />
 
             <Modal

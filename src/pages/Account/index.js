@@ -199,7 +199,7 @@ function Account() {
                 loading={loading}
                 columns={columns}
                 dataSource={filteredUsers}
-                pagination={{ pageSize: 5 }}
+                pagination={{ pageSize: 15 }}
             />
 
             <Modal

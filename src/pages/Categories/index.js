@@ -124,7 +124,7 @@ const CategoryManager = () => {
                 dataSource={Array.isArray(categories)
                     ? categories.map((cat) => ({ ...cat, key: cat.id }))
                     : []}
-                pagination={{ pageSize: 5 }}
+                pagination={{ pageSize: 15 }}
             />
 
             <Modal

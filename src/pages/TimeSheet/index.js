@@ -289,7 +289,7 @@ const TimeSheet = () => {
                 loading={loading}
                 bordered
                 pagination={{
-                    pageSize: 10,
+                    pageSize: 15,
                     showSizeChanger: false,
                     hideOnSinglePage: true
                 }}
