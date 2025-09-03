@@ -10,7 +10,6 @@ import { getAllProducts } from '../../services/productsService';
 import { getCookie } from '../../helpers/cookies';
 import { updateInvoice, createInvoice } from '../../services/invoicesService';
 
-
 const getProducts = async () => {
     try {
         return await getAllProducts();
@@ -42,7 +41,6 @@ const Order = () => {
     const [discountValue, setDiscountValue] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [loading, setLoading] = useState(false);
-    //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
     const [note, setNote] = useState(""); // Ghi chú
 
     const location = useLocation();
@@ -54,7 +52,7 @@ const Order = () => {
 
     const socketRef = useRef(null);
 
-    // Khởi tạo WebSocket
+    // Kết nối WebSocket với PrintServer
     useEffect(() => {
         socketRef.current = new WebSocket("ws://localhost:5000");
 
@@ -75,7 +73,7 @@ const Order = () => {
         };
     }, []);
 
-    //  Load dữ liệu ban đầu
+    // Load dữ liệu ban đầu
     useEffect(() => {
         const fetchData = async () => {
             const [categoryData, productData] = await Promise.all([
@@ -101,7 +99,7 @@ const Order = () => {
                 setDiscountValue(order.discountValue || 0);
                 setPaymentMethod(order.paymentmethod === 0 ? "cash" : "transfer");
                 //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-                setNote(order.note || ""); // Nạp ghi chú
+                setNote(order.note || "");
             }
         };
 
@@ -149,7 +147,7 @@ const Order = () => {
             discountAmount: discountAmount.toFixed(2),
             editedReason: order?.editedReason || null,
             //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-            note: note || null // Gửi ghi chú
+            note: note || null
         };
 
         if (!order) {
@@ -165,47 +163,92 @@ const Order = () => {
                 : await createInvoice(invoiceData);
 
             if (result?.success || result?.id || result?.data || result?.message === "Updated") {
-                // Gửi dữ liệu sang PrintServer qua WebSocket 
-                //20.8.2025 fixbug in được hoá đơn đã chỉnh sửa
-                if (socketRef.current?.readyState === WebSocket.OPEN) {
-                    socketRef.current.send(JSON.stringify({
-                        type: 'print',
-                        invoice: {
-                            id: result.data?.id || result.id || Date.now(),
-                            items: cart,
-                            discountType,
-                            discountValue,
-                            discountAmount,
-                            total,
-                            user: getCookie('fullname'),
-                            paymentMethod,
-                            createdAt: new Date().toLocaleString('vi-VN'),
-                            //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-                            note
-                        }
-                    }));
-                }
+                //Nếu là hóa đơn mới → in ngay và hiện thông báo
+                if (!order) {
+                    if (socketRef.current?.readyState === WebSocket.OPEN) {
+                        socketRef.current.send(JSON.stringify({
+                            type: 'print',
+                            invoice: {
+                                id: result.data?.id || result.id || Date.now(),
+                                items: cart,
+                                discountType,
+                                discountValue,
+                                discountAmount,
+                                total,
+                                user: getCookie('fullname'),
+                                paymentMethod,
+                                createdAt: new Date().toLocaleString('vi-VN'),
+                                note
+                            }
+                        }));
+                    }
 
-                Swal.fire({
-                    title: order ? '🎉 Sửa hóa đơn thành công' : '🎉 Thanh toán thành công',
-                    html: `
+                    // Thông báo thành công
+                    Swal.fire({
+                        title: '🎉 Thanh toán thành công',
+                        html: `
+                <p><strong>Tổng:</strong> ${parseFloat(total).toLocaleString('vi-VN')}₫</p>
+                <p><strong>Số lượng món:</strong> ${cart.reduce((sum, item) => sum + item.quantity, 0)}</p>
+            `,
+                        icon: 'success',
+                        confirmButtonText: 'Đóng',
+                        customClass: { popup: 'swal2-border-radius' }
+                    }).then(() => {
+                        navigate('/order');
+                    });;
+                } else {
+                    //Nếu là hóa đơn chỉnh sửa → hỏi có in không trước
+                    Swal.fire({
+                        title: 'In hóa đơn?',
+                        text: "Bạn có muốn in hóa đơn sau khi chỉnh sửa thành công?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Có, in ngay',
+                        cancelButtonText: 'Không'
+                    }).then((resultConfirm) => {
+                        if (resultConfirm.isConfirmed) {
+                            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                                socketRef.current.send(JSON.stringify({
+                                    type: 'print',
+                                    invoice: {
+                                        id: order.id,
+                                        items: cart,
+                                        discountType,
+                                        discountValue,
+                                        discountAmount,
+                                        total,
+                                        user: getCookie('fullname'),
+                                        paymentMethod,
+                                        createdAt: new Date().toLocaleString('vi-VN'),
+                                        note
+                                    }
+                                }));
+                            }
+                        }
+
+                        // Sau khi hỏi in xong mới hiện thông báo thành công
+                        Swal.fire({
+                            title: '🎉 Sửa hóa đơn thành công',
+                            html: `
                     <p><strong>Tổng:</strong> ${parseFloat(total).toLocaleString('vi-VN')}₫</p>
                     <p><strong>Số lượng món:</strong> ${cart.reduce((sum, item) => sum + item.quantity, 0)}</p>
                 `,
-                    icon: 'success',
-                    confirmButtonText: 'Đóng',
-                    customClass: { popup: 'swal2-border-radius' }
-                });
+                            icon: 'success',
+                            confirmButtonText: 'Đóng',
+                            customClass: { popup: 'swal2-border-radius' }
+                        }).then(() => {
+                            navigate('/order');
+                        });
+                    });
+                }
 
+                // Reset dữ liệu
                 setCart([]);
                 setDiscountValue(0);
                 setShowDiscountInput(false);
-                //15.8.2025 nnanh bổ sung tính năng thêm ghi chú
-                setNote(""); // reset ghi chú
-                //20.8.2025 Fix bug khi lưu lại thành công chỉnh sửa" THÌ xoá hoá đơn cũ đi
-                if (order) {
-                    navigate('/order'); // load lại trang Order mà không truyền order cũ
-                }
+                setNote("");
             } else {
                 message.error(`${order ? 'Sửa' : 'Thanh toán'} thất bại: ${result.message || 'Lỗi không xác định'}`);
             }

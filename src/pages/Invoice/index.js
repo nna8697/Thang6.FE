@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, DatePicker, Select, Modal, Input, Tag, Space, message } from 'antd';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Table, Button, DatePicker, Select, Modal, Input, Tag, Space, message, Card } from 'antd';
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import './Invoice.scss';
@@ -22,6 +22,7 @@ const Invoice = () => {
 
     const [orders, setOrders] = useState([]);
     const [statusFilter, setStatusFilter] = useState(null);
+    const [paymentFilter, setPaymentFilter] = useState(null); // 🔹 lọc phương thức thanh toán
     const [dateRange, setDateRange] = useState([dayjs(), dayjs()]);
     const [selectedDateFilter, setSelectedDateFilter] = useState('today');
     const [showCustomRange, setShowCustomRange] = useState(false);
@@ -71,12 +72,10 @@ const Invoice = () => {
         }
     };
 
-    // Khi load lần đầu: mặc định today
     useEffect(() => {
         fetchInvoices('today');
     }, []);
 
-    // Khi đổi filter ngày
     useEffect(() => {
         if (selectedDateFilter === 'custom') {
             fetchInvoices('custom', dateRange);
@@ -197,6 +196,20 @@ const Invoice = () => {
         navigate('/Order', { state: { order: updatedOrder.find(o => o.id === selectedEditOrder.id) } });
     };
 
+    // 🔹 Tính toán tổng
+    const { totalAll, totalCash, totalBank } = useMemo(() => {
+        const filtered = orders.filter(o =>
+            (statusFilter === null || o.status === statusFilter) &&
+            (paymentFilter === null || o.paymentmethod === paymentFilter)
+        );
+
+        const totalAll = filtered.reduce((sum, o) => sum + o.total, 0);
+        const totalCash = filtered.filter(o => o.paymentmethod === 0).reduce((s, o) => s + o.total, 0);
+        const totalBank = filtered.filter(o => o.paymentmethod === 1).reduce((s, o) => s + o.total, 0);
+
+        return { totalAll, totalCash, totalBank };
+    }, [orders, statusFilter, paymentFilter]);
+
     const columns = [
         {
             title: 'STT',
@@ -221,7 +234,7 @@ const Invoice = () => {
         {
             title: 'Phương thức thanh toán',
             dataIndex: 'paymentmethod',
-            render: val => val == 0 ? 'Tiền mặt' : 'Chuyển khoản',
+            render: val => val === 0 ? 'Tiền mặt' : 'Chuyển khoản',
         },
         {
             title: 'Người tạo',
@@ -260,6 +273,7 @@ const Invoice = () => {
 
     return (
         <div className="order-list">
+            {/* Bộ lọc */}
             <div className="order-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <Select
                     style={{ width: 200 }}
@@ -296,15 +310,46 @@ const Invoice = () => {
                     <Option value={1}>Hoá đơn xoá</Option>
                     <Option value={2}>Hoá đơn sửa</Option>
                 </Select>
+
+                {/* 🔹 Lọc theo phương thức thanh toán */}
+                <Select
+                    placeholder="Phương thức thanh toán"
+                    value={paymentFilter}
+                    onChange={setPaymentFilter}
+                    style={{ width: 200 }}
+                    allowClear
+                >
+                    <Option value={null}>Tất cả</Option>
+                    <Option value={0}>Tiền mặt</Option>
+                    <Option value={1}>Chuyển khoản</Option>
+                </Select>
             </div>
 
+            {/* Thống kê tổng */}
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <Card title="Tổng cộng" style={{ flex: 1 }}>
+                    <h2>{totalAll.toLocaleString('vi-VN')}₫</h2>
+                </Card>
+                <Card title="Tổng tiền mặt" style={{ flex: 1 }}>
+                    <h2>{totalCash.toLocaleString('vi-VN')}₫</h2>
+                </Card>
+                <Card title="Tổng chuyển khoản" style={{ flex: 1 }}>
+                    <h2>{totalBank.toLocaleString('vi-VN')}₫</h2>
+                </Card>
+            </div>
+
+            {/* Bảng hóa đơn */}
             <Table
                 columns={columns}
-                dataSource={orders.filter(o => statusFilter === null || o.status === statusFilter)}
+                dataSource={orders.filter(o =>
+                    (statusFilter === null || o.status === statusFilter) &&
+                    (paymentFilter === null || o.paymentmethod === paymentFilter)
+                )}
                 rowKey="id"
                 pagination={{ pageSize: 15 }}
             />
 
+            {/* Modal xoá */}
             <Modal
                 title="Lý do xoá hoá đơn"
                 open={showModal}
@@ -319,6 +364,7 @@ const Invoice = () => {
                 />
             </Modal>
 
+            {/* Modal chỉnh sửa */}
             <Modal
                 title="Lý do chỉnh sửa hoá đơn"
                 open={showEditReasonModal}
