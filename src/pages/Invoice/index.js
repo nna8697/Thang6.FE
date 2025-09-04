@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Table, Button, DatePicker, Select, Modal, Input, Tag, Space, message, Card } from 'antd';
-import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, DeleteOutlined, PrinterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import './Invoice.scss';
 import InvoiceDetailModal from './InvoiceDetailModal';
@@ -22,7 +22,7 @@ const Invoice = () => {
 
     const [orders, setOrders] = useState([]);
     const [statusFilter, setStatusFilter] = useState(null);
-    const [paymentFilter, setPaymentFilter] = useState(null); // 🔹 lọc phương thức thanh toán
+    const [paymentFilter, setPaymentFilter] = useState(null);
     const [dateRange, setDateRange] = useState([dayjs(), dayjs()]);
     const [selectedDateFilter, setSelectedDateFilter] = useState('today');
     const [showCustomRange, setShowCustomRange] = useState(false);
@@ -36,6 +36,29 @@ const Invoice = () => {
     const [editReason, setEditReason] = useState('');
     const [editReasonOption, setEditReasonOption] = useState('');
     const [selectedEditOrder, setSelectedEditOrder] = useState(null);
+
+    const socketRef = useRef(null);
+
+    // Kết nối WebSocket với PrintServer
+    useEffect(() => {
+        socketRef.current = new WebSocket("ws://localhost:5000");
+
+        socketRef.current.onopen = () => {
+            console.log("WebSocket connected to PrintServer");
+        };
+
+        socketRef.current.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
+
+        socketRef.current.onclose = () => {
+            console.log("WebSocket disconnected");
+        };
+
+        return () => {
+            socketRef.current?.close();
+        };
+    }, []);
 
     // Hàm fetch invoices
     const fetchInvoices = async (filterType = 'today', range = []) => {
@@ -197,7 +220,7 @@ const Invoice = () => {
     };
 
     // 🔹 Tính toán tổng
-    const { totalAll, totalCash, totalBank } = useMemo(() => {
+    const { totalAll, totalCash, totalBank, totalDiscount, totalInvoices, totalItems } = useMemo(() => {
         const filtered = orders.filter(o =>
             (statusFilter === null || o.status === statusFilter) &&
             (paymentFilter === null || o.paymentmethod === paymentFilter)
@@ -206,9 +229,35 @@ const Invoice = () => {
         const totalAll = filtered.reduce((sum, o) => sum + o.total, 0);
         const totalCash = filtered.filter(o => o.paymentmethod === 0).reduce((s, o) => s + o.total, 0);
         const totalBank = filtered.filter(o => o.paymentmethod === 1).reduce((s, o) => s + o.total, 0);
+        const totalDiscount = filtered.reduce((s, o) => s + (o.discount || 0), 0);
+        const totalInvoices = filtered.length;
+        const totalItems = filtered.reduce((sum, o) => sum + (o.orders?.length || 0), 0);
 
-        return { totalAll, totalCash, totalBank };
+        return { totalAll, totalCash, totalBank, totalDiscount, totalInvoices, totalItems };
     }, [orders, statusFilter, paymentFilter]);
+
+    // 🔹 Hàm in phiếu chốt ca
+    const handlePrintShiftReport = () => {
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+            message.error("Không thể kết nối tới PrintServer");
+            return;
+        }
+
+        const reportData = {
+            type: "SHIFT_REPORT",
+            title: "Phiếu chốt ca hôm nay",
+            date: dayjs().format("DD/MM/YYYY HH:mm"),
+            totalAll,
+            totalCash,
+            totalBank,
+            totalInvoices,
+            totalItems,
+            totalDiscount      
+        };
+
+        socketRef.current.send(JSON.stringify(reportData));
+        message.success("Đã gửi phiếu chốt ca tới máy in");
+    };
 
     const columns = [
         {
@@ -274,7 +323,7 @@ const Invoice = () => {
     return (
         <div className="order-list">
             {/* Bộ lọc */}
-            <div className="order-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="order-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <Select
                     style={{ width: 200 }}
                     value={selectedDateFilter}
@@ -311,7 +360,6 @@ const Invoice = () => {
                     <Option value={2}>Hoá đơn sửa</Option>
                 </Select>
 
-                {/* 🔹 Lọc theo phương thức thanh toán */}
                 <Select
                     placeholder="Phương thức thanh toán"
                     value={paymentFilter}
@@ -323,6 +371,15 @@ const Invoice = () => {
                     <Option value={0}>Tiền mặt</Option>
                     <Option value={1}>Chuyển khoản</Option>
                 </Select>
+
+                {/* 🔹 Nút In phiếu chốt ca */}
+                <Button
+                    type="primary"
+                    icon={<PrinterOutlined />}
+                    onClick={handlePrintShiftReport}
+                >
+                    In phiếu chốt ca
+                </Button>
             </div>
 
             {/* Thống kê tổng */}
@@ -336,6 +393,15 @@ const Invoice = () => {
                 <Card title="Tổng chuyển khoản" style={{ flex: 1 }}>
                     <h2>{totalBank.toLocaleString('vi-VN')}₫</h2>
                 </Card>
+                <Card title="Tổng giảm giá" style={{ flex: 1 }}>
+                    <h2>{totalDiscount.toLocaleString('vi-VN')}₫</h2>
+                </Card>
+                <Card title="Tổng hoá đơn" style={{ flex: 1 }}>
+                    <h2>{totalInvoices}</h2>
+                </Card>
+                {/* <Card title="Tổng món" style={{ flex: 1 }}>
+                    <h2>{totalItems}</h2>
+                </Card> */}
             </div>
 
             {/* Bảng hóa đơn */}

@@ -15,9 +15,10 @@ const ProductGrid = ({ products, onAddToCart }) => (
                         <div className="product-image">
                             <img
                                 src={
-                                    product.imgLink
-                                        ? `${API_DOMAIN}${product.imgLink}`
-                                        : 'https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg'
+                                    // product.imgLink
+                                    //     ? `${API_DOMAIN}${product.imgLink}`
+                                    //     : 'https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg'
+                                    `https://media1.tenor.com/m/H7Nz57h1zLgAAAAC/cat-mouth-open.gif`
                                 }
                                 alt={product.name}
                             />

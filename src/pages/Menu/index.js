@@ -138,7 +138,8 @@ const Menu = () => {
             key: "imgLink",
             render: (imgLink) => (
                 <img
-                    src={imgLink ? `${API_DOMAIN}` + imgLink : "https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg"}
+                    // src={imgLink ? `${API_DOMAIN}` + imgLink : "https://ongbi.vn/wp-content/uploads/2022/09/CA-PHE-MUOI.jpg"}
+                    src={`https://media1.tenor.com/m/H7Nz57h1zLgAAAAC/cat-mouth-open.gif`}
                     alt="Hình ảnh món"
                     style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8 }}
                 />
