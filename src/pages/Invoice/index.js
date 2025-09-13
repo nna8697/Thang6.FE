@@ -221,11 +221,12 @@ const Invoice = () => {
 
     // 🔹 Tính toán tổng
     const { totalAll, totalCash, totalBank, totalDiscount, totalInvoices, totalItems } = useMemo(() => {
-        const filtered = orders.filter(o =>
-            (statusFilter === null || o.status === statusFilter) &&
-            (paymentFilter === null || o.paymentmethod === paymentFilter)
-        );
+        //13/9 nnanh fix bug xoá hoá đơn không trừ tiền
 
+        const filtered = orders.filter(o =>
+            (((statusFilter === null || o.status === statusFilter) &&
+                (paymentFilter === null || o.paymentmethod === paymentFilter))) && o.status !== 1
+        );
         const totalAll = filtered.reduce((sum, o) => sum + o.total, 0);
         const totalCash = filtered.filter(o => o.paymentmethod === 0).reduce((s, o) => s + o.total, 0);
         const totalBank = filtered.filter(o => o.paymentmethod === 1).reduce((s, o) => s + o.total, 0);
@@ -252,7 +253,7 @@ const Invoice = () => {
             totalBank,
             totalInvoices,
             totalItems,
-            totalDiscount      
+            totalDiscount
         };
 
         socketRef.current.send(JSON.stringify(reportData));
