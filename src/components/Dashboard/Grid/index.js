@@ -143,12 +143,6 @@ function Grid() {
             {/* Các Box giả định khác */}
             <Row gutter={[20, 20]} className='mt-20'>
                 <Col xxl={8}>
-                    <CardItem title="Tổng tiền nhập hàng trong tháng"  >
-                        <MonthlyImportTotal></MonthlyImportTotal>
-                    </CardItem>
-
-                </Col>
-                <Col xxl={8}>
                     <CardItem title="Nguyên liệu sắp hết">
                         <LowStockIngredients></LowStockIngredients>
                     </CardItem>
@@ -157,6 +151,12 @@ function Grid() {
                     <CardItem title="Vật dụng sắp hết">
                         <LowStockTools></LowStockTools>
                     </CardItem>
+                </Col>
+                <Col xxl={8}>
+                    <CardItem title="Tổng tiền nhập hàng trong tháng"  >
+                        {/* <MonthlyImportTotal></MonthlyImportTotal> */}
+                    </CardItem>
+
                 </Col>
             </Row>
             <Row gutter={[20, 20]} className='mt-20'>

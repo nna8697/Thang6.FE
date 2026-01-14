@@ -1,6 +1,7 @@
 import { Card, Spin, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { API_DOMAIN } from '../../../config';
+import "./LowStockTools.scss";
 
 function LowStockTools() {
     const [data, setData] = useState([]);
@@ -42,7 +43,7 @@ function LowStockTools() {
     ];
 
     return (
-        <Card style={{ height: '400px' }}>
+        <Card style={{ height: '400px' }} className="stock-list">
             {loading ? <Spin /> : <Table columns={columns} dataSource={data} rowKey="id" pagination={false} size="small" />}
         </Card>
     );
