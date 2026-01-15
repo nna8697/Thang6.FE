@@ -64,7 +64,7 @@ function LayoutDefault() {
                         <Outlet />
                     </Content>
                     <Footer className="footer">
-                        © {new Date().getFullYear()} Tháng 6 Cafe V1.5. Created by Kel Min
+                        © {new Date().getFullYear()} Tháng 6 Cafe V1.6. Created by Kel Min
                     </Footer>
                 </div>
             </Layout>
