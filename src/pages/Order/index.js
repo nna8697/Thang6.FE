@@ -268,6 +268,11 @@ const Order = () => {
         p => p.categoryId === selectedCategory && p.status === 1
     );
 
+    const totalQuantity = cart.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+    );
+
     return (
         <div className="order-pos">
             <Row gutter={[20, 20]}>
@@ -298,7 +303,7 @@ const Order = () => {
 
                 <Col xxl={7} xl={7} lg={7} md={7} sm={7} xs={7}>
                     <div className="cart-panel">
-                        <h3><ShoppingCartOutlined /> Giỏ hàng ({cart.length})</h3>
+                        <h3><ShoppingCartOutlined /> Giỏ hàng ({totalQuantity}) món</h3>
 
                         <div className="cart-items">
                             {cart.length === 0 ? (

@@ -110,12 +110,12 @@ function Grid() {
             </div>
 
             <Row gutter={[10, 10]}>
-                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={12}>
+                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={24}>
                     <CardItem title="Tổng doanh thu" icon={<DollarOutlined className="card-icon primary" />}>
                         {(stats.totalRevenue ?? 0).toLocaleString()}đ
                     </CardItem>
                 </Col>
-                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={12}>
+                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={24}>
                     <CardItem title="Tăng/Giảm so với trước đó" icon={
                         stats.revenueChangePercent < 0 ? (
                             <ArrowDownOutlined className="card-icon" style={{ color: 'red' }} />
@@ -128,12 +128,12 @@ function Grid() {
                         }
                     </CardItem>
                 </Col>
-                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={12}>
+                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={24}>
                     <CardItem title="Tổng giảm giá & hoa hồng" icon={<GiftOutlined className="card-icon warning" />}>
                         {(stats.totalDiscountAndCommission ?? 0).toLocaleString()}đ
                     </CardItem>
                 </Col>
-                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={12}>
+                <Col xxl={6} xl={6} lg={6} md={12} sm={12} xs={24}>
                     <CardItem title="Tổng số hoá đơn" icon={<FileTextOutlined className="card-icon info" />}>
                         {stats.invoiceCount ?? 0}
                     </CardItem>
